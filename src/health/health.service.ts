@@ -1,19 +1,19 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { RelayService } from '../relay/services/relay.service';
-import { WalletService } from '../relay/services/wallet.service';
-import { GasEstimatorService } from '../relay/services/gas-estimator.service';
-import { TaskTrackerService } from '../relay/services/task-tracker.service';
+import { Injectable, Logger } from "@nestjs/common";
+import { RelayService } from "../relay/services/relay.service";
+import { WalletService } from "../relay/services/wallet.service";
+import { GasEstimatorService } from "../relay/services/gas-estimator.service";
+import { TaskTrackerService } from "../relay/services/task-tracker.service";
 
 /**
  * HealthService monitors the operational status of all Coffea Relay Service components.
- * 
+ *
  * This service performs comprehensive health checks on:
  * - Database connectivity and performance
  * - Blockchain RPC provider availability
  * - Wallet service functionality
  * - Gas estimation accuracy
  * - Task tracking persistence
- * 
+ *
  * Health checks are designed to be:
  * - Fast (< 5 seconds total)
  * - Non-intrusive (read-only operations)
@@ -38,9 +38,9 @@ export class HealthService {
   async checkOverallHealth(): Promise<boolean> {
     try {
       const healthStatus = await this.getDetailedHealth();
-      return healthStatus.status === 'healthy';
+      return healthStatus.status === "healthy";
     } catch (error) {
-      this.logger.error('Overall health check failed:', error);
+      this.logger.error("Overall health check failed:", error);
       return false;
     }
   }
@@ -64,27 +64,31 @@ export class HealthService {
     ];
 
     try {
-      const [walletHealthy, gasEstimatorHealthy, taskTrackerHealthy] = await Promise.allSettled(healthChecks);
+      const [walletHealthy, gasEstimatorHealthy, taskTrackerHealthy] =
+        await Promise.allSettled(healthChecks);
 
       // Process health check results
-      components.wallet = walletHealthy.status === 'fulfilled' && walletHealthy.value;
-      components.gasEstimator = gasEstimatorHealthy.status === 'fulfilled' && gasEstimatorHealthy.value;
-      components.taskTracker = taskTrackerHealthy.status === 'fulfilled' && taskTrackerHealthy.value;
-      
+      components.wallet =
+        walletHealthy.status === "fulfilled" && walletHealthy.value;
+      components.gasEstimator =
+        gasEstimatorHealthy.status === "fulfilled" && gasEstimatorHealthy.value;
+      components.taskTracker =
+        taskTrackerHealthy.status === "fulfilled" && taskTrackerHealthy.value;
+
       // Database health is implied by task tracker health
       components.database = components.taskTracker;
 
-      const allHealthy = Object.values(components).every(status => status);
+      const allHealthy = Object.values(components).every((status) => status);
 
       return {
-        status: allHealthy ? 'healthy' : 'unhealthy',
+        status: allHealthy ? "healthy" : "unhealthy",
         components,
         errors: this.getComponentErrors(healthChecks),
       };
     } catch (error) {
-      this.logger.error('Detailed health check failed:', error);
+      this.logger.error("Detailed health check failed:", error);
       return {
-        status: 'unhealthy',
+        status: "unhealthy",
         components,
         error: error.message,
       };
@@ -101,11 +105,11 @@ export class HealthService {
     try {
       const isHealthy = await this.walletService.checkHealth();
       if (!isHealthy) {
-        this.logger.warn('Wallet service health check failed');
+        this.logger.warn("Wallet service health check failed");
       }
       return isHealthy;
     } catch (error) {
-      this.logger.error('Wallet health check error:', error);
+      this.logger.error("Wallet health check error:", error);
       return false;
     }
   }
@@ -120,11 +124,11 @@ export class HealthService {
     try {
       const isHealthy = await this.gasEstimatorService.checkHealth();
       if (!isHealthy) {
-        this.logger.warn('Gas estimator service health check failed');
+        this.logger.warn("Gas estimator service health check failed");
       }
       return isHealthy;
     } catch (error) {
-      this.logger.error('Gas estimator health check error:', error);
+      this.logger.error("Gas estimator health check error:", error);
       return false;
     }
   }
@@ -139,11 +143,11 @@ export class HealthService {
     try {
       const isHealthy = await this.taskTrackerService.checkHealth();
       if (!isHealthy) {
-        this.logger.warn('Task tracker service health check failed');
+        this.logger.warn("Task tracker service health check failed");
       }
       return isHealthy;
     } catch (error) {
-      this.logger.error('Task tracker health check error:', error);
+      this.logger.error("Task tracker health check error:", error);
       return false;
     }
   }
@@ -152,13 +156,15 @@ export class HealthService {
    * Extracts error messages from failed health check promises.
    * Used to provide detailed error information in health responses.
    */
-  private getComponentErrors(healthCheckPromises: Promise<boolean>[]): string[] {
+  private getComponentErrors(
+    healthCheckPromises: Promise<boolean>[],
+  ): string[] {
     const errors: string[] = [];
-    
+
     healthCheckPromises.forEach((promise, index) => {
-      if (promise && typeof promise.then === 'function') {
-        promise.catch(error => {
-          const componentNames = ['wallet', 'gasEstimator', 'taskTracker'];
+      if (promise && typeof promise.then === "function") {
+        promise.catch((error) => {
+          const componentNames = ["wallet", "gasEstimator", "taskTracker"];
           errors.push(`${componentNames[index]}: ${error.message}`);
         });
       }

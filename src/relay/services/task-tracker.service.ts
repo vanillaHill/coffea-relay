@@ -1,14 +1,18 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { RelayTransactionRequest, RelayTaskStatus, RelayTaskState } from '../interfaces/relay.interface';
-import { RelayTask } from '../../database/entities/relay-task.entity';
+import { Injectable, Logger } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import {
+  RelayTransactionRequest,
+  RelayTaskStatus,
+  RelayTaskState,
+} from "../interfaces/relay.interface";
+import { RelayTask } from "../../database/entities/relay-task.entity";
 
 /**
  * TaskTrackerService handles the lifecycle management of relay transactions.
  * It provides persistent storage and real-time tracking capabilities for all
  * transaction requests processed by the relay service.
- * 
+ *
  * Key responsibilities:
  * - Create and store new relay tasks
  * - Update task status throughout the transaction lifecycle
@@ -29,7 +33,10 @@ export class TaskTrackerService {
    * Creates a new relay task record in the database.
    * This is the first step in the transaction lifecycle.
    */
-  async createTask(taskId: string, request: RelayTransactionRequest): Promise<void> {
+  async createTask(
+    taskId: string,
+    request: RelayTransactionRequest,
+  ): Promise<void> {
     try {
       const task = this.taskRepository.create({
         taskId,
@@ -47,7 +54,9 @@ export class TaskTrackerService {
       });
 
       await this.taskRepository.save(task);
-      this.logger.log(`Created task ${taskId} for user ${request.user} on chain ${request.chainId}`);
+      this.logger.log(
+        `Created task ${taskId} for user ${request.user} on chain ${request.chainId}`,
+      );
     } catch (error) {
       this.logger.error(`Failed to create task ${taskId}:`, error);
       throw new Error(`Task creation failed: ${error.message}`);
@@ -59,19 +68,19 @@ export class TaskTrackerService {
    * This method is called throughout the transaction lifecycle to track progress.
    */
   async updateTaskStatus(
-    taskId: string, 
-    status: RelayTaskState, 
+    taskId: string,
+    status: RelayTaskState,
     metadata?: {
       transactionHash?: string;
       blockNumber?: number;
       gasUsed?: number;
       effectiveGasPrice?: string;
       error?: string;
-    }
+    },
   ): Promise<void> {
     try {
       const task = await this.taskRepository.findOne({ where: { taskId } });
-      
+
       if (!task) {
         throw new Error(`Task ${taskId} not found`);
       }
@@ -80,10 +89,12 @@ export class TaskTrackerService {
       task.updatedAt = new Date();
 
       if (metadata) {
-        if (metadata.transactionHash) task.transactionHash = metadata.transactionHash;
+        if (metadata.transactionHash)
+          task.transactionHash = metadata.transactionHash;
         if (metadata.blockNumber) task.blockNumber = metadata.blockNumber;
         if (metadata.gasUsed) task.gasUsed = metadata.gasUsed;
-        if (metadata.effectiveGasPrice) task.effectiveGasPrice = metadata.effectiveGasPrice;
+        if (metadata.effectiveGasPrice)
+          task.effectiveGasPrice = metadata.effectiveGasPrice;
         if (metadata.error) task.error = metadata.error;
       }
 
@@ -102,7 +113,7 @@ export class TaskTrackerService {
   async getTaskStatus(taskId: string): Promise<RelayTaskStatus> {
     try {
       const task = await this.taskRepository.findOne({ where: { taskId } });
-      
+
       if (!task) {
         throw new Error(`Task ${taskId} not found`);
       }
@@ -130,24 +141,26 @@ export class TaskTrackerService {
    * Useful for user dashboards and transaction history.
    */
   async getTasksByUser(
-    userAddress: string, 
-    chainId?: number, 
-    limit: number = 50
+    userAddress: string,
+    chainId?: number,
+    limit: number = 50,
   ): Promise<RelayTaskStatus[]> {
     try {
       const queryBuilder = this.taskRepository
-        .createQueryBuilder('task')
-        .where('task.user = :userAddress', { userAddress: userAddress.toLowerCase() })
-        .orderBy('task.createdAt', 'DESC')
+        .createQueryBuilder("task")
+        .where("task.user = :userAddress", {
+          userAddress: userAddress.toLowerCase(),
+        })
+        .orderBy("task.createdAt", "DESC")
         .limit(limit);
 
       if (chainId) {
-        queryBuilder.andWhere('task.chainId = :chainId', { chainId });
+        queryBuilder.andWhere("task.chainId = :chainId", { chainId });
       }
 
       const tasks = await queryBuilder.getMany();
 
-      return tasks.map(task => ({
+      return tasks.map((task) => ({
         taskId: task.taskId,
         chainId: task.chainId,
         status: task.status,
@@ -173,12 +186,12 @@ export class TaskTrackerService {
     try {
       await this.taskRepository.count({
         where: {
-          createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000)
-        }
+          createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
+        },
       });
       return true;
     } catch (error) {
-      this.logger.error('Task tracker health check failed:', error);
+      this.logger.error("Task tracker health check failed:", error);
       return false;
     }
   }

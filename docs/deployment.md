@@ -51,10 +51,20 @@ LOG_LEVEL=info
 DATABASE_URL=postgresql://username:password@localhost:5432/coffea_relay
 REDIS_URL=redis://localhost:6379
 
-# Blockchain RPC Endpoints
-RPC_URL_MAINNET=https://mainnet.infura.io/v3/YOUR_PROJECT_ID
-RPC_URL_SEPOLIA=https://sepolia.infura.io/v3/YOUR_PROJECT_ID
-RPC_URL_HARDHAT=http://localhost:8545
+# Blockchain RPC Endpoints (Multi-Provider Configuration)
+# Primary provider (Alchemy) - Priority 1
+ALCHEMY_MAINNET_RPC_URL=https://eth-mainnet.alchemyapi.io/v2/YOUR_PROJECT_ID
+ALCHEMY_SEPOLIA_RPC_URL=https://eth-sepolia.alchemyapi.io/v2/YOUR_PROJECT_ID
+
+# Fallback provider (Infura) - Priority 2
+INFURA_MAINNET_RPC_URL=https://mainnet.infura.io/v3/YOUR_PROJECT_ID
+INFURA_SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/YOUR_PROJECT_ID
+
+# Legacy support - backward compatibility
+ETHEREUM_MAINNET_RPC_URL=https://eth-mainnet.alchemyapi.io/v2/YOUR_PROJECT_ID
+
+# Development environment
+HARDHAT_MAINNET_RPC_URL=http://localhost:8545
 
 # Relay Service Configuration
 RELAY_PRIVATE_KEY=0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
@@ -75,6 +85,38 @@ TRANSACTION_TIMEOUT_MS=300000
 POLLING_INTERVAL_MS=5000
 MAX_RETRY_ATTEMPTS=60
 ```
+
+### Multi-Provider Failover System
+
+The Coffea Relay Service implements an advanced multi-provider failover system through the `BaseProviderService`, ensuring high availability and reliability:
+
+**Provider Priority System:**
+1. **Alchemy** (Priority 1) - Primary provider with best performance
+2. **Infura** (Priority 2) - Secondary fallback provider  
+3. **Public Nodes** (Priority 3) - Tertiary fallback for maximum redundancy
+
+**Key Features:**
+- **Automatic Failover**: Seamlessly switches between providers when one fails
+- **Health Monitoring**: Continuous provider health checks with 5-second timeout
+- **Provider Statistics**: Real-time monitoring of provider performance
+- **Timeout Protection**: 8-second timeout per provider operation
+- **Chain-Specific Configuration**: Independent provider management per blockchain
+
+**Configuration Best Practices:**
+
+```bash
+# Configure multiple providers for maximum reliability
+ALCHEMY_MAINNET_RPC_URL=https://eth-mainnet.alchemyapi.io/v2/YOUR_ALCHEMY_KEY
+INFURA_MAINNET_RPC_URL=https://mainnet.infura.io/v3/YOUR_INFURA_KEY
+
+# Optional: Monitor provider performance
+# The service automatically logs provider switches and failures
+LOG_LEVEL=info  # Set to 'debug' for detailed provider switching logs
+```
+
+**Health Check Endpoints:**
+- `/api/health` - Overall service health including provider status
+- Provider health is automatically monitored and reported in service logs
 
 ### Security Considerations
 

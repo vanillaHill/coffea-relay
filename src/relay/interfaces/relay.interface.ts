@@ -29,15 +29,17 @@ export interface RelayTaskStatus {
 }
 
 export enum RelayTaskState {
-  PENDING = 'pending',
-  SUBMITTED = 'submitted',
-  SUCCESS = 'success',
-  FAILED = 'failed',
-  CANCELLED = 'cancelled',
+  PENDING = "pending",
+  SUBMITTED = "submitted",
+  SUCCESS = "success",
+  FAILED = "failed",
+  CANCELLED = "cancelled",
 }
 
 export interface IRelayService {
-  submitTransaction(request: RelayTransactionRequest): Promise<RelayTransactionResponse>;
+  submitTransaction(
+    request: RelayTransactionRequest,
+  ): Promise<RelayTransactionResponse>;
   getTaskStatus(taskId: string): Promise<RelayTaskStatus>;
   cancelTask(taskId: string): Promise<boolean>;
   isSupported(chainId: number): boolean;

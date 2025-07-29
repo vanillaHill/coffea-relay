@@ -46,6 +46,51 @@ const response = await fetch('http://localhost:3003/api/relay/sponsored-call', {
 });
 ```
 
+## Reliability & Performance Features
+
+### Multi-Provider Failover System
+
+The Coffea Relay Service uses an advanced `BaseProviderService` architecture that provides superior reliability compared to single-provider setups:
+
+**Enhanced Reliability Benefits:**
+- **Zero Downtime**: Automatic failover between multiple RPC providers (Alchemy, Infura, Public Nodes)
+- **Improved Performance**: Intelligent provider selection based on response time and health
+- **Cost Optimization**: Automatic load balancing across providers to optimize API usage
+- **Monitoring**: Real-time provider health monitoring and performance metrics
+
+**Integration Advantages:**
+```typescript
+// Your application automatically benefits from:
+// 1. Provider failover - no code changes needed
+// 2. Health monitoring - automatic provider switching
+// 3. Performance optimization - best provider selection
+// 4. Error recovery - robust handling of provider failures
+
+// The service handles all complexity behind a simple API:
+const response = await fetch('/api/relay/sponsored-call', {
+  method: 'POST',
+  body: JSON.stringify(transactionRequest)
+});
+// Multi-provider failover happens automatically!
+```
+
+**Monitoring Integration:**
+```typescript
+// Optional: Monitor provider performance in your application
+const healthCheck = await fetch('/api/relay/health');
+const status = await healthCheck.json();
+
+// status includes provider health information:
+// {
+//   status: "healthy",
+//   providers: {
+//     "alchemy_1": true,
+//     "infura_1": true,
+//     "publicnode_1": false
+//   }
+// }
+```
+
 ## Coffea Engine Integration
 
 ### Updating the Existing Relay Module
