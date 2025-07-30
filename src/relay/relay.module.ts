@@ -1,12 +1,10 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
-import { TypeOrmModule } from "@nestjs/typeorm";
 import { RelayController } from "./controllers/relay.controller";
 import { RelayService } from "./services/relay.service";
 import { WalletService } from "./services/wallet.service";
 import { GasEstimatorService } from "./services/gas-estimator.service";
 import { TaskTrackerService } from "./services/task-tracker.service";
-import { RelayTask } from "../database/entities/relay-task.entity";
 import { CommonModule } from "../common/common.module";
 
 /**
@@ -32,11 +30,11 @@ import { CommonModule } from "../common/common.module";
  *
  * Dependencies:
  * - ConfigModule: Environment configuration
- * - TypeOrmModule: Database access for task tracking
- * - RelayTask entity: Core data model
+ * - DatabaseClient: Database service access via API client
+ * - CommonModule: Shared services and utilities
  */
 @Module({
-  imports: [ConfigModule, TypeOrmModule.forFeature([RelayTask]), CommonModule],
+  imports: [ConfigModule, CommonModule],
   controllers: [RelayController],
   providers: [
     RelayService,

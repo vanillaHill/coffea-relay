@@ -18,10 +18,7 @@ interface GasPrices {
 export class GasEstimatorService extends BaseProviderService {
   private readonly CACHE_TTL = 60; // 1 minute cache in seconds for Redis
 
-  constructor(
-    configService: ConfigService,
-    cacheService: CacheService,
-  ) {
+  constructor(configService: ConfigService, cacheService: CacheService) {
     super(configService, cacheService);
   }
 
@@ -98,7 +95,7 @@ export class GasEstimatorService extends BaseProviderService {
 
   async getGasPrices(chainId: number): Promise<GasPrices> {
     const cacheKey = `gas_prices:${chainId}`;
-    
+
     // Check Redis cache first
     const cached = await this.cacheService.get<GasPrices>(cacheKey);
     if (cached) {

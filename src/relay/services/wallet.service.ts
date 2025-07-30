@@ -19,10 +19,7 @@ interface TransactionParams extends RelayTransactionRequest {
 export class WalletService extends BaseProviderService {
   private readonly wallet: ethers.Wallet;
 
-  constructor(
-    configService: ConfigService,
-    cacheService: CacheService,
-  ) {
+  constructor(configService: ConfigService, cacheService: CacheService) {
     super(configService, cacheService);
 
     // Initialize wallet

@@ -7,6 +7,8 @@ A custom blockchain transaction relay service that provides gasless transaction 
 - **Gasless Transactions**: Users can execute DeFi strategies without paying gas fees
 - **Multi-Chain Support**: Ethereum Mainnet, Sepolia testnet, and Hardhat development
 - **Compatible API**: Drop-in replacement for Gelato relay with the same interface
+- **Multi-Provider Failover**: Automatic failover between Alchemy, Infura, and public RPC providers
+- **Redis Caching**: High-performance caching for gas prices and provider health
 - **Transaction Monitoring**: Real-time status tracking with WebSocket and polling support
 - **Cost Optimization**: No premium fees, only actual gas costs
 - **Robust Security**: Secure transaction signing and validation
@@ -50,9 +52,10 @@ yarn start:dev
 Key environment variables:
 
 - `RELAY_PRIVATE_KEY`: Private key for the relay wallet (keep secure!)
-- `RPC_URL_*`: Blockchain RPC endpoints for each network
-- `DATABASE_URL`: PostgreSQL connection string
-- `REDIS_URL`: Redis connection for caching
+- `ALCHEMY_*_RPC_URL`: Primary Alchemy RPC endpoints for each network
+- `INFURA_*_RPC_URL`: Fallback Infura RPC endpoints for each network
+- `DATABASE_SERVICE_URL`: Coffea Database service API endpoint
+- `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`: Redis connection for caching
 
 ## API Compatibility
 

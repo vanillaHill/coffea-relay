@@ -1,6 +1,5 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
-import { DatabaseModule } from "./database/database.module";
 import { RelayModule } from "./relay/relay.module";
 import { HealthModule } from "./health/health.module";
 
@@ -9,7 +8,7 @@ import { HealthModule } from "./health/health.module";
  *
  * This module bootstraps the entire application and configures:
  * - Environment variable loading and validation
- * - Database connectivity and ORM configuration
+ * - Database service client connectivity
  * - Core relay service functionality
  * - Health monitoring and diagnostics
  *
@@ -17,7 +16,6 @@ import { HealthModule } from "./health/health.module";
  * ```
  * AppModule
  * ├── ConfigModule (Environment configuration)
- * ├── DatabaseModule (PostgreSQL + TypeORM)
  * ├── RelayModule (Core relay functionality)
  * └── HealthModule (Service monitoring)
  * ```
@@ -25,7 +23,7 @@ import { HealthModule } from "./health/health.module";
  * Environment Variables Required:
  * - NODE_ENV: Application environment (development/production)
  * - PORT: HTTP server port (default: 3003)
- * - DATABASE_URL: PostgreSQL connection string
+ * - DATABASE_SERVICE_URL: Database service API endpoint
  * - RELAY_PRIVATE_KEY: Private key for transaction signing
  * - RPC_URL_*: Blockchain RPC endpoints for each supported chain
  *
@@ -47,9 +45,6 @@ import { HealthModule } from "./health/health.module";
         abortEarly: false,
       },
     }),
-
-    // Database connectivity
-    DatabaseModule,
 
     // Core relay functionality
     RelayModule,

@@ -225,11 +225,15 @@ export abstract class BaseProviderService {
     }
 
     const cacheKey = `provider_health:${chainId}`;
-    
+
     // Check Redis cache first
-    const cached = await this.cacheService.get<{ [key: string]: boolean }>(cacheKey);
+    const cached = await this.cacheService.get<{ [key: string]: boolean }>(
+      cacheKey,
+    );
     if (cached) {
-      this.logger.debug(`Retrieved provider health for chain ${chainId} from cache`);
+      this.logger.debug(
+        `Retrieved provider health for chain ${chainId} from cache`,
+      );
       return cached;
     }
 
@@ -254,7 +258,11 @@ export abstract class BaseProviderService {
     }
 
     // Cache the health status
-    await this.cacheService.set(cacheKey, healthStatus, this.PROVIDER_HEALTH_CACHE_TTL);
+    await this.cacheService.set(
+      cacheKey,
+      healthStatus,
+      this.PROVIDER_HEALTH_CACHE_TTL,
+    );
 
     return healthStatus;
   }

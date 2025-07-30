@@ -1,6 +1,5 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { ethers } from "ethers";
 import { v4 as uuidv4 } from "uuid";
 import {
   RelayTransactionRequest,
@@ -22,11 +21,11 @@ export class RelayService implements IRelayService {
     private readonly configService: ConfigService,
     private readonly walletService: WalletService,
     private readonly gasEstimator: GasEstimatorService,
-    private readonly taskTracker: TaskTrackerService,
+    private readonly taskTracker: TaskTrackerService
   ) {}
 
   async submitTransaction(
-    request: RelayTransactionRequest,
+    request: RelayTransactionRequest
   ): Promise<RelayTransactionResponse> {
     const taskId = uuidv4();
 
@@ -70,7 +69,7 @@ export class RelayService implements IRelayService {
         RelayTaskState.SUBMITTED,
         {
           transactionHash,
-        },
+        }
       );
 
       // Start monitoring transaction
@@ -84,7 +83,7 @@ export class RelayService implements IRelayService {
     } catch (error) {
       this.logger.error(
         `Transaction submission failed for task ${taskId}:`,
-        error,
+        error
       );
 
       // Update task with error
@@ -117,7 +116,7 @@ export class RelayService implements IRelayService {
       // Can only cancel pending tasks
       if (status.status !== RelayTaskState.PENDING) {
         this.logger.warn(
-          `Cannot cancel task ${taskId} with status ${status.status}`,
+          `Cannot cancel task ${taskId} with status ${status.status}`
         );
         return false;
       }
@@ -156,12 +155,12 @@ export class RelayService implements IRelayService {
   private async monitorTransaction(
     taskId: string,
     transactionHash: string,
-    chainId: number,
+    chainId: number
   ): Promise<void> {
     const maxRetries = this.configService.get<number>("MAX_RETRY_ATTEMPTS", 60);
     const pollingInterval = this.configService.get<number>(
       "POLLING_INTERVAL_MS",
-      5000,
+      5000
     );
 
     let retries = 0;
@@ -170,7 +169,7 @@ export class RelayService implements IRelayService {
       try {
         const receipt = await this.walletService.getTransactionReceipt(
           transactionHash,
-          chainId,
+          chainId
         );
 
         if (receipt) {
@@ -188,7 +187,7 @@ export class RelayService implements IRelayService {
           });
 
           this.logger.log(
-            `Transaction ${transactionHash} completed with status: ${status}`,
+            `Transaction ${transactionHash} completed with status: ${status}`
           );
           return;
         }
@@ -201,10 +200,10 @@ export class RelayService implements IRelayService {
             RelayTaskState.FAILED,
             {
               error: "Transaction timeout - not confirmed within time limit",
-            },
+            }
           );
           this.logger.error(
-            `Transaction ${transactionHash} timed out after ${retries} retries`,
+            `Transaction ${transactionHash} timed out after ${retries} retries`
           );
           return;
         }
@@ -214,7 +213,7 @@ export class RelayService implements IRelayService {
       } catch (error) {
         this.logger.error(
           `Error monitoring transaction ${transactionHash}:`,
-          error,
+          error
         );
         retries++;
 
@@ -224,7 +223,7 @@ export class RelayService implements IRelayService {
             RelayTaskState.FAILED,
             {
               error: `Monitoring failed: ${error.message}`,
-            },
+            }
           );
           return;
         }

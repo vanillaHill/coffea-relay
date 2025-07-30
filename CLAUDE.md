@@ -68,8 +68,8 @@ The service implements Gelato-compatible API:
 Critical environment variables:
 - `RELAY_PRIVATE_KEY` - Private key for transaction signing (keep secure!)
 - `RPC_URL_*` - Blockchain RPC endpoints for each supported network
-- `DATABASE_URL` - PostgreSQL connection string
-- `REDIS_URL` - Redis connection for caching
+- `DATABASE_SERVICE_URL` - Coffea Database service API endpoint
+- `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD` - Redis connection configuration for caching
 - `NODE_ENV` - Application environment (development/production)
 - `PORT` - HTTP server port (default: 3003)
 
